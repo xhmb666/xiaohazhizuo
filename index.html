@@ -153,6 +153,23 @@
     }
     .ann-body { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.85); }
 
+    /* 切换动画 */
+    .content-wrap {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .content-wrap.fade-out {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    .content-wrap.fade-in {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    .content-wrap.fade-in.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
     .footer { text-align: center; padding: 20px; font-size: 12px; color: rgba(255,255,255,0.35); }
 
     /* 侧边栏 */
@@ -449,6 +466,7 @@
     </div>
 
     <div class="container">
+      <div class="content-wrap" id="contentWrap">
       <div class="welcome-card">
         <div class="welcome-row">
           <div class="welcome-icon">
@@ -472,6 +490,7 @@
       </div>
 
       <div id="announcementList"></div>
+      </div>
     </div>
 
     <div class="footer">企鹅交流：1043816309</div>
@@ -608,6 +627,10 @@
     }
 
     function switchServer(server) {
+      if (server === currentServer) {
+        closeSidebar();
+        return;
+      }
       currentServer = server;
       // 更新侧边栏选中状态
       document.getElementById("tab-huai").classList.toggle("active", server === "huai");
@@ -626,9 +649,22 @@
         leDesc.textContent = "暂无公告";
         leBadge.style.display = "none";
       }
-      // 关闭侧边栏并渲染
+      // 关闭侧边栏
       closeSidebar();
-      render();
+      // 切换动画
+      const wrap = document.getElementById("contentWrap");
+      wrap.classList.add("fade-out");
+      setTimeout(() => {
+        render();
+        wrap.classList.remove("fade-out");
+        wrap.classList.add("fade-in");
+        requestAnimationFrame(() => {
+          wrap.classList.add("show");
+        });
+        setTimeout(() => {
+          wrap.classList.remove("fade-in", "show");
+        }, 300);
+      }, 250);
     }
 
     function checkServer() {
